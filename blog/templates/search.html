@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}EQuest - Search{% endblock title %}
+{% block body %}
+<div class="container my-5 row mx-5">
+  <h3>Search Results</h3>
+  {% if posts|length < 1 %}
+    <p>No search results</p>
+  {% endif %}
+  {% for post in posts %}
+    <div class="card mx-2 my-3" style="width: 18rem">
+      <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" />
+      <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text">{{ post.content| truncatechars:100 }}</p>
+        <a href="/{{ post.slug }}" class="btn btn-outline-dark">Read More</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock body %}

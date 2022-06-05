@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %} {{ post.title }} {% endblock title %}
+{% block body %}
+<div class="container my-5">
+  <h1 class="my-5">{{post.title}}</h1>
+  <div id="img-carousel" class="carousel slide w-50 my-5" data-bs-ride="true">
+    <div class="carousel-indicators">
+      {% for photo in photos %}
+        <button type="button" data-bs-target="#img-carousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.counter0 == 0 %} active {% endif %}"></button>
+      {% endfor %}
+    </div>
+    <div class="carousel-inner">
+      {% for photo in photos %}
+        <div class="carousel-item {% if forloop.counter0 == 0 %} active {% endif %}">
+          <img src="{{ photo.images.url }}" class="d-block w-100" alt="{{ post.title }}" width="640px" height="380px">
+        </div>
+      {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#img-carousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#img-carousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+  <p>{{post.content}}</p>
+</div>
+<div class="container my-5">
+  <h3 class="my-3">Comments - {{ comments.count }}</h3>
+  {% if user.is_authenticated %}
+    <form action="/postComment" method="POST">
+      {% csrf_token %}
+      <div class="form-group w-50 my-3">
+          <textarea type="text" class="form-control" id="comment" name="comment" placeholder="Add a comment..."></textarea>
+      </div>
+      <input type="hidden" name="postSno" value="{{ post.sno }}">
+      <button type="submit" class="btn btn-dark">Submit</button>
+    </form>
+  {% else %}
+    <span>Please login to comment</span>
+  {% endif %}
+  {% for comment in comments %}
+    <div class="row my-3">
+      <div class="col-md-11">
+        <b>{{ comment.user.username }}</b> at {{ comment.timestamp }}
+        <div>{{comment.comment}}</div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock body %}
