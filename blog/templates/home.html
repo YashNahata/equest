@@ -8,7 +8,7 @@
       <div class="card-body">
         <h5 class="card-title">{{ post.title }}</h5>
         <p class="card-text">
-          {{ post.content| truncatechars:100 }}
+          <div class="preview">{{ post.content|safe|truncatechars:100 }}</div>
         </p>
         <a href="/{{ post.slug }}" class="btn btn-outline-dark">Read More</a>
       </div>
@@ -16,3 +16,11 @@
   {% endfor %}
   </div>
 {% endblock body %}
+{% block js %}
+<script>
+  const preview = document.querySelectorAll(".preview");
+  preview.forEach(e => {
+    e.innerHTML = e.innerText;
+  })
+</script>
+{% endblock js %}

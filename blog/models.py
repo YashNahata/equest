@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 class Post(models.Model):
@@ -8,7 +9,7 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=130)
     time = models.DateTimeField(blank=True)
-    content = models.TextField()
+    content = RichTextField()
     image = models.FileField(blank=True)
     def __str__(self):
         return self.title

@@ -11,9 +11,16 @@ def home(request):
 
 def blogPost(request, slug):
     post = Post.objects.filter(slug=slug).first()
-    comments = BlogComment.objects.filter(post=post)
+    comments = BlogComment.objects.filter(post=post, parent=None)
+    replies = BlogComment.objects.filter(post=post).exclude(parent=None)
     photos = PostImage.objects.filter(post=post)
-    return render(request, 'blogPost.html', {"post": post, "comments": comments, "photos": photos})
+    replyDict = {}
+    for reply in replies:
+        if reply.parent.sno not in replyDict.keys():
+            replyDict[reply.parent.sno]=[reply]
+        else:
+            replyDict[reply.parent.sno].append(reply)
+    return render(request, 'blogPost.html', {"post": post, "comments": comments, "photos": photos, 'replyDict': replyDict})
 
 def search(request):
     query = request.GET['q']
@@ -79,13 +86,20 @@ def postComment(request):
         user = request.user
         postSno = request.POST.get('postSno')
         post = Post.objects.get(sno=postSno)
+        parentSno = request.POST.get('parentSno')
         if len(comment) < 1:
             messages.error(request, "Comment cannot be empty")
             return redirect(f"/{post.slug}")
         if len(comment) > 300:
             messages.error(request, "Comment must be less than 300 characters")
             return redirect(f"/{post.slug}")
-        comment = BlogComment(comment=comment, user=user, post=post)
-        comment.save()
-        messages.success(request, "Your comment has been posted successfully")
+        if parentSno == "":
+            comment = BlogComment(comment=comment, user=user, post=post)
+            comment.save()
+            messages.success(request, "Your comment has been posted successfully")
+        else:
+            parent = BlogComment.objects.get(sno=parentSno)
+            comment = BlogComment(comment=comment, user=user, post=post , parent=parent)
+            comment.save()
+            messages.success(request, "Your reply has been posted successfully")
         return redirect(f"/{post.slug}")
