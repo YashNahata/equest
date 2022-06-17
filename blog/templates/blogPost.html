@@ -38,6 +38,11 @@
       </div>
       <input type="hidden" name="postSno" value="{{ post.sno }}">
       <input type="hidden" name="parentSno" value="">
+      {% if user.username == 'admin' %}
+        <input type="hidden" name="approved" value="True">
+      {% else %}
+        <input type="hidden" name="approved" value="False">
+      {% endif %}
       <button type="submit" class="btn btn-dark">Submit</button>
     </form>
   {% else %}
@@ -64,6 +69,11 @@
                       <input type="hidden" name="parentSno" value="{{comment.sno}}">
                   </div>
                   <input type="hidden" name="postSno" value="{{ post.sno }}">
+                  {% if user.username == 'admin' %}
+                    <input type="hidden" name="approved" value="True">
+                  {% else %}
+                    <input type="hidden" name="approved" value="False">
+                  {% endif %}
                   <button type="submit" class="btn btn-dark">Submit</button>
                 </form>
               {% endif %}

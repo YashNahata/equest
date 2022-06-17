@@ -11,8 +11,8 @@ def home(request):
 
 def blogPost(request, slug):
     post = Post.objects.filter(slug=slug).first()
-    comments = BlogComment.objects.filter(post=post, parent=None)
-    replies = BlogComment.objects.filter(post=post).exclude(parent=None)
+    comments = BlogComment.objects.filter(post=post, parent=None, approved=True)
+    replies = BlogComment.objects.filter(post=post, approved=True).exclude(parent=None)
     photos = PostImage.objects.filter(post=post)
     replyDict = {}
     for reply in replies:
@@ -87,6 +87,7 @@ def postComment(request):
         postSno = request.POST.get('postSno')
         post = Post.objects.get(sno=postSno)
         parentSno = request.POST.get('parentSno')
+        approved = request.POST.get('approved')
         if len(comment) < 1:
             messages.error(request, "Comment cannot be empty")
             return redirect(f"/{post.slug}")
@@ -94,12 +95,12 @@ def postComment(request):
             messages.error(request, "Comment must be less than 300 characters")
             return redirect(f"/{post.slug}")
         if parentSno == "":
-            comment = BlogComment(comment=comment, user=user, post=post)
+            comment = BlogComment(comment=comment, user=user, post=post, approved=approved)
             comment.save()
-            messages.success(request, "Your comment has been posted successfully")
+            messages.success(request, "Your comment has been submitted successfully. Will be published after approval.")
         else:
             parent = BlogComment.objects.get(sno=parentSno)
-            comment = BlogComment(comment=comment, user=user, post=post , parent=parent)
+            comment = BlogComment(comment=comment, user=user, post=post , parent=parent, approved=approved)
             comment.save()
-            messages.success(request, "Your reply has been posted successfully")
+            messages.success(request, "Your reply has been submitted successfully. Will be published after approval.")
         return redirect(f"/{post.slug}")
